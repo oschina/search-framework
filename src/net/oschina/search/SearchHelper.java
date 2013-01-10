@@ -3,6 +3,7 @@ package net.oschina.search;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.TokenStream;
@@ -99,6 +100,15 @@ public class SearchHelper {
             log.error("Unabled to hightlight text", e);
         }
         return (result != null)?result:text;
+    }
+    
+    /**
+     * 返回文档中保存的对象 id
+     * @param doc
+     * @return
+     */
+    public static long docid(Document doc) {
+    	return NumberUtils.toLong(doc.get(FN_ID), 0);
     }
 
     /**
