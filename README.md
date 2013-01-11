@@ -5,6 +5,6 @@ License: Public Domain
 
 包含内容：
 
-- 重建索引工具 -> RebuildIndexer.java
+- 重建索引工具 -> IndexRebuilder.java
 - 增量构建索引工具 -> IndexUpdater.java
 - 全文搜索框架
