@@ -41,4 +41,11 @@ public interface Searchable {
      */
     public Map<String, String> extendIndexDatas();
 
+    /**
+     * 列出id值大于指定值得所有对象
+     * @param id
+     * @param count
+     * @return
+     */
+	public List<? extends Searchable> ListAfter(long id, int count) ;
 }
