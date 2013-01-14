@@ -16,6 +16,7 @@ public interface Searchable {
      * @return 文档id
      */
     public long id();
+    public void setId(long id);
 
     /**
      * 要存储的字段

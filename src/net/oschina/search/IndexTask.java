@@ -6,9 +6,9 @@ package net.oschina.search;
  */
 public interface IndexTask {
 
-	public byte OPT_ADD 		= 0x01;
-	public byte OPT_UPDATE 	= 0x02;
-	public byte OPT_DELETE 	= 0x04;
+	public byte OPT_ADD 	= 0x01;	//添加索引
+	public byte OPT_UPDATE 	= 0x02;	//更新索引
+	public byte OPT_DELETE 	= 0x04;	//删除索引
 	
 	/**
 	 * 返回更新操作类型

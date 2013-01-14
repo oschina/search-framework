@@ -10,8 +10,11 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.*;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.highlight.*;
+import org.apache.lucene.util.Version;
 import org.wltea.analyzer.core.IKSegmenter;
 import org.wltea.analyzer.core.Lexeme;
 import org.wltea.analyzer.lucene.IKAnalyzer;
@@ -33,6 +36,7 @@ public class SearchHelper {
 
     private final static Log log = LogFactory.getLog(SearchHelper.class);
     private final static IKAnalyzer analyzer = new IKAnalyzer();
+	private final static BooleanQuery nullQuery = new BooleanQuery();
     private final static Formatter highlighter_formatter = new SimpleHTMLFormatter("<span class=\"highlight\">","</span>");
 
     private final static String FN_ID = "___id";
@@ -45,6 +49,33 @@ public class SearchHelper {
             log.error("Unabled to read stopword file", e);
         }
     }};
+    
+    /**
+     * 生成查询条件
+     * @param field
+     * @param q
+     * @param boost
+     * @param machine_action
+     * @return
+     */
+	public static Query makeQuery(String field, String q, float boost) {
+		if(StringUtils.isBlank(q) || StringUtils.isBlank(field))
+			return nullQuery;
+		QueryParser parser = new QueryParser(Version.LUCENE_40, field, analyzer);
+		parser.setDefaultOperator(QueryParser.AND_OPERATOR);
+		try{
+			Query querySinger = parser.parse(q);
+			querySinger.setBoost(boost);
+			//System.out.println(querySinger.toString());
+			return querySinger;
+		}catch(Exception e){
+			TermQuery queryTerm = new TermQuery(new Term(field, q));
+			queryTerm.setBoost(boost);
+			//System.out.println(queryTerm.toString());
+			return queryTerm;
+		}
+	}
+	
 
     /**
      * 关键字切分
@@ -109,6 +140,23 @@ public class SearchHelper {
      */
     public static long docid(Document doc) {
     	return NumberUtils.toLong(doc.get(FN_ID), 0);
+    }
+    
+    /**
+     * 获取文档对应的对象类
+     * @param doc
+     * @return
+     * @throws ClassNotFoundException 
+     */
+	public static Searchable doc2obj(Document doc) {
+    	try{
+    		Searchable obj = (Searchable)Class.forName(doc.get(FN_CLASSNAME)).newInstance();
+    		obj.setId(docid(doc));
+    		return obj;
+    	}catch(Exception e){
+    		log.error("Unabled generate object from document#id="+doc.toString(), e);
+    		return null;
+    	}
     }
 
     /**

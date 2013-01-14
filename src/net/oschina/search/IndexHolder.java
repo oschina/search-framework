@@ -9,8 +9,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.search.IndexSearcher;
@@ -64,6 +66,35 @@ public class IndexHolder {
 	}
 	
 	/**
+	 * 多个资料库的搜索
+	 * @param objClasses
+	 * @return
+	 * @throws IOException
+	 */
+	private IndexSearcher getSearchers(List<Class<? extends Searchable>> objClasses) throws IOException {
+		IndexReader[] readers = new IndexReader[objClasses.size()];
+		int idx = 0;
+		for(Class<? extends Searchable> objClass : objClasses){
+			FSDirectory dir = FSDirectory.open(new File(indexPath + objClass.getSimpleName()));
+			readers[idx++] = DirectoryReader.open(dir);
+		}
+		return new IndexSearcher(new MultiReader(readers, true));
+	}
+	
+	/**
+	 * 多库搜索
+	 * @param objClasses
+	 * @param query
+	 * @param max_count
+	 * @return
+	 * @throws IOException
+	 */
+	public List<Searchable> find(List<Class<? extends Searchable>> objClasses, Query query, int max_count) throws IOException {
+		IndexSearcher searcher = getSearchers(objClasses);
+		return find(searcher, query, max_count);
+	}
+	
+	/**
 	 * 搜索
 	 * @param beanClass
 	 * @param query
@@ -71,19 +102,32 @@ public class IndexHolder {
 	 * @return
 	 * @throws IOException
 	 */
-	public List<Long> find(Class<? extends Searchable> objClass, Query query, int max_count) throws IOException {
+	public List<Searchable> find(Class<? extends Searchable> objClass, Query query, int max_count) throws IOException {
 		IndexSearcher searcher = getSearcher(objClass);
+		return find(searcher, query, max_count);
+	}
+
+	/**
+	 * 搜索
+	 * @param beanClass
+	 * @param query
+	 * @param max_count
+	 * @return
+	 * @throws IOException
+	 */
+	private List<Searchable> find(IndexSearcher searcher, Query query, int max_count) throws IOException {
 		try{
 			TopDocs hits = searcher.search(query, null, max_count);
 			if(hits==null) return null;
-			List<Long> results = new ArrayList<Long>();
+			List<Searchable> results = new ArrayList<Searchable>();
 			int numResults = Math.min(hits.totalHits, max_count);
 			for (int i = 0; i < numResults; i++){
 				ScoreDoc s_doc = (ScoreDoc)hits.scoreDocs[i];
 				Document doc = searcher.doc(s_doc.doc);
 				long id = SearchHelper.docid(doc);
-				if(id > 0 && !results.contains(id))
-					results.add(id);	
+				if(id > 0 && !results.contains(id)){
+					results.add(SearchHelper.doc2obj(doc));	
+				}
 			}
 			return results;
 		}catch(IOException e){
