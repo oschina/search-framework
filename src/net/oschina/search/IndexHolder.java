@@ -148,6 +148,7 @@ public class IndexHolder {
 		IndexWriter writer = getWriter(objs.get(0).getClass());
 		try{
 			for (Searchable obj : objs) {
+				System.out.println("============> " + obj.getClass().getName());
 				Document doc = SearchHelper.obj2doc(obj);
 				writer.addDocument(doc);
 				doc_count++;

@@ -40,6 +40,7 @@ public class IndexRebuilder {
 		//初始化索引管理器
 		IndexHolder holder = IndexHolder.init(idx_path);
 		for(String beanClass : StringUtils.split(beans, ',')){
+			//Searchable obj = (Searchable)IndexRebuilder.class.getClassLoader().loadClass(beanClass).newInstance();
 			Searchable obj = (Searchable)Class.forName(beanClass).newInstance();
 			build(holder, obj, batch_count);
 		}

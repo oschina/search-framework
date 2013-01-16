@@ -171,6 +171,7 @@ public class SearchHelper {
         if(obj == null)
             return null;
 
+		System.out.println("============> " + obj.getClass().getName());
         Document doc = new Document();
         doc.add(new StoredField(FN_ID, obj.id()));
         doc.add(new StoredField(FN_CLASSNAME, obj.getClass().getName()));
@@ -180,7 +181,8 @@ public class SearchHelper {
         if(fields != null)
             for(String fn : fields) {
                 Object fv = readField(obj, fn);
-                doc.add(obj2field(fn, fv, true));
+                if(fv != null)
+                	doc.add(obj2field(fn, fv, true));
             }
 
         //索引字段
@@ -188,7 +190,8 @@ public class SearchHelper {
         if(fields != null)
             for(String fn : fields) {
                 String fv = (String)readField(obj, fn);
-                doc.add(new TextField(fn, fv, Field.Store.NO));
+                if(fv != null)
+                	doc.add(new TextField(fn, fv, Field.Store.NO));
             }
 
         //扩展存储字段
@@ -196,7 +199,8 @@ public class SearchHelper {
         if(eDatas != null)
             for(String fn : eDatas.keySet()){
                 String fv = eDatas.get(fn);
-                doc.add(obj2field(fn, fv, true));
+                if(fv != null)
+                	doc.add(obj2field(fn, fv, true));
             }
 
         //扩展索引字段
@@ -204,7 +208,8 @@ public class SearchHelper {
         if(eDatas != null)
             for(String fn : eDatas.keySet()){
                 String fv = eDatas.get(fn);
-                doc.add(new TextField(fn, fv, Field.Store.NO));
+                if(fv != null)
+                	doc.add(new TextField(fn, fv, Field.Store.NO));
             }
 
         return doc;
@@ -221,13 +226,16 @@ public class SearchHelper {
         try {
             return PropertyUtils.getProperty(obj, field);
         } catch (Exception e) {
-            log.error("Unabled to get property '"+field+"' of " + obj.getClass().getSimpleName(), e);
+            log.error("Unabled to get property '"+field+"' of " + obj.getClass().getName(), e);
             return null;
         }
 
     }
 
     private static Field obj2field(String field, Object fieldValue, boolean store) {
+    	if(fieldValue == null)
+    		return null;
+    	
         if (fieldValue instanceof Date) //日期
             return new LongField(field, ((Date)fieldValue).getTime(), store?Field.Store.YES:Field.Store.NO);
         if (fieldValue instanceof Long) //长整数
