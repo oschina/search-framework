@@ -124,9 +124,9 @@ public class IndexHolder {
 			for (int i = 0; i < numResults; i++){
 				ScoreDoc s_doc = (ScoreDoc)hits.scoreDocs[i];
 				Document doc = searcher.doc(s_doc.doc);
-				long id = SearchHelper.docid(doc);
-				if(id > 0 && !results.contains(id)){
-					results.add(SearchHelper.doc2obj(doc));	
+				Searchable obj = SearchHelper.doc2obj(doc);
+				if(obj != null && !results.contains(obj)){
+					results.add(obj);	
 				}
 			}
 			return results;

@@ -150,8 +150,11 @@ public class SearchHelper {
      */
 	public static Searchable doc2obj(Document doc) {
     	try{
+    		long id = docid(doc);
+    		if(id <= 0)
+    			return null;
     		Searchable obj = (Searchable)Class.forName(doc.get(FN_CLASSNAME)).newInstance();
-    		obj.setId(docid(doc));
+    		obj.setId(id);
     		return obj;
     	}catch(Exception e){
     		log.error("Unabled generate object from document#id="+doc.toString(), e);

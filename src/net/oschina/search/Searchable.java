@@ -9,7 +9,7 @@ import java.util.Map;
  * Date: 13-1-10
  * Time: 上午11:31
  */
-public interface Searchable {
+public interface Searchable extends Comparable<Searchable> {
 
     /**
      * 文档的唯一编号
