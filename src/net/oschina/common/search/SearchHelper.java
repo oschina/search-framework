@@ -48,8 +48,36 @@ public class SearchHelper {
         }catch(IOException e){
             log.error("Unabled to read stopword file", e);
         }
-    }};
-    
+    }};    
+
+	private final static List<String> ReserveKeys = new ArrayList<String>(){{		
+        try{
+            addAll(IOUtils.readLines(SearchHelper.class.getResourceAsStream("/keywords.dic")));
+        }catch(IOException e){
+            log.error("Unabled to read keywords file", e);
+        }
+	}};
+
+	/**
+	 * 重整搜索关键短语
+	 * @param key
+	 * @return
+	 */
+	public static String cleanupKey(String key) {
+		if(ReserveKeys.contains(key.trim().toLowerCase()))
+			return key;
+		
+		StringBuilder sb = new StringBuilder();
+		List<String> keys = splitKeywords(key);
+		for(String word : keys){
+			if(sb.length() > 0)
+				sb.append(' ');
+			sb.append(word);
+		}
+		
+		return sb.toString();
+	}	
+	
     /**
      * 生成查询条件
      * @param field

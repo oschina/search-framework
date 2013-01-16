@@ -80,6 +80,22 @@ public class IndexHolder {
 		}
 		return new IndexSearcher(new MultiReader(readers, true));
 	}
+
+	/**
+	 * 优化索引库
+	 * @param objClass
+	 * @throws IOException
+	 */
+	public void optimize(Class<? extends Searchable> objClass) throws IOException {
+		IndexWriter writer = getWriter(objClass);
+		try{
+			writer.forceMerge(1);
+			writer.commit();
+		}finally{
+			writer.close();
+			writer = null;
+		}
+	}
 	
 	/**
 	 * 多库搜索
@@ -89,7 +105,7 @@ public class IndexHolder {
 	 * @return
 	 * @throws IOException
 	 */
-	public List<Searchable> find(List<Class<? extends Searchable>> objClasses, Query query, int max_count) throws IOException {
+	public List<Long> find(List<Class<? extends Searchable>> objClasses, Query query, int max_count) throws IOException {
 		IndexSearcher searcher = getSearchers(objClasses);
 		return find(searcher, query, max_count);
 	}
@@ -102,7 +118,7 @@ public class IndexHolder {
 	 * @return
 	 * @throws IOException
 	 */
-	public List<Searchable> find(Class<? extends Searchable> objClass, Query query, int max_count) throws IOException {
+	public List<Long> find(Class<? extends Searchable> objClass, Query query, int max_count) throws IOException {
 		IndexSearcher searcher = getSearcher(objClass);
 		return find(searcher, query, max_count);
 	}
@@ -115,7 +131,7 @@ public class IndexHolder {
 	 * @return
 	 * @throws IOException
 	 */
-	private List<Searchable> find(IndexSearcher searcher, Query query, int max_count) throws IOException {
+	private List<Long> find(IndexSearcher searcher, Query query, int max_count) throws IOException {
 		try{
 			TopDocs hits = searcher.search(query, null, max_count);
 			if(hits==null) return null;
@@ -129,7 +145,10 @@ public class IndexHolder {
 					results.add(obj);	
 				}
 			}
-			return results;
+			List<Long> ids = new ArrayList<Long>(results.size());
+			for(Searchable obj : results)
+				ids.add(obj.id());
+			return ids;
 		}catch(IOException e){
 			log.error("Unabled to find via query: " + query, e);
 		}
@@ -148,7 +167,6 @@ public class IndexHolder {
 		IndexWriter writer = getWriter(objs.get(0).getClass());
 		try{
 			for (Searchable obj : objs) {
-				System.out.println("============> " + obj.getClass().getName() + " : " + obj.getClass().getProtectionDomain().getCodeSource().getLocation());
 				Document doc = SearchHelper.obj2doc(obj);
 				writer.addDocument(doc);
 				doc_count++;

@@ -43,7 +43,9 @@ public class IndexRebuilder {
 			//Searchable obj = (Searchable)IndexRebuilder.class.getClassLoader().loadClass(beanClass).newInstance();
 			Searchable obj = (Searchable)Class.forName(beanClass).newInstance();
 			build(holder, obj, batch_count);
+			holder.optimize(obj.getClass());
 		}
+		System.exit(0);
     }
 
 	private static CommandLine parseCmdArgs(String[] args) {

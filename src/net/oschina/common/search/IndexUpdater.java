@@ -90,18 +90,21 @@ public class IndexUpdater {
 	 * @throws Exception
 	 */
 	private static void execute(IndexHolder holder, IndexTask task, boolean update_status) throws Exception {
-		switch(task.getOpt()){
-		case IndexTask.OPT_ADD:
-			holder.add(Arrays.asList(task.object()));
-			break;
-		case IndexTask.OPT_DELETE:
-			holder.delete(Arrays.asList(task.object()));
-			break;
-		case IndexTask.OPT_UPDATE:
-			holder.update(Arrays.asList(task.object()));
+		Searchable obj = (Searchable)task.object();
+		if(obj != null){
+			switch(task.getOpt()){
+			case IndexTask.OPT_ADD:
+				holder.add(Arrays.asList(obj));
+				break;
+			case IndexTask.OPT_DELETE:
+				holder.delete(Arrays.asList(obj));
+				break;
+			case IndexTask.OPT_UPDATE:
+				holder.update(Arrays.asList(obj));
+			}
+			if(update_status)
+				task.afterBuild();
 		}
-		if(update_status)
-			task.afterBuild();
 	}
 
 }

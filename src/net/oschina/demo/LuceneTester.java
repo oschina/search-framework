@@ -4,7 +4,6 @@
 package net.oschina.demo;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import net.oschina.common.search.IndexHolder;
 
@@ -21,13 +20,9 @@ public class LuceneTester {
 	 */
 	public static void main(String[] args) throws IOException {
 		IndexHolder holder = IndexHolder.init("D:\\TEST");
-		holder.add(Arrays.asList(
-				new Post(1, "hello world","你好世界"),
-				new Post(2, "hello oschina","你好开源中国"),
-				new Post(3, "hello open source","你好开源"),
-				new Post(4, "hello china","你好中国")
-		));
-
+		for(int i=0;i<10;i++)
+			holder.optimize(Post.class);
+		System.exit(0);
 	}
 
 }
