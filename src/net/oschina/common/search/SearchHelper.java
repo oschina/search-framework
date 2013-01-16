@@ -1,4 +1,4 @@
-package net.oschina.search;
+package net.oschina.common.search;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.io.IOUtils;
@@ -171,7 +171,6 @@ public class SearchHelper {
         if(obj == null)
             return null;
 
-		System.out.println("============> " + obj.getClass().getName());
         Document doc = new Document();
         doc.add(new StoredField(FN_ID, obj.id()));
         doc.add(new StoredField(FN_CLASSNAME, obj.getClass().getName()));

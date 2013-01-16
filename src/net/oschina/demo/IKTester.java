@@ -1,6 +1,6 @@
 package net.oschina.demo;
 
-import net.oschina.search.SearchHelper;
+import net.oschina.common.search.SearchHelper;
 
 /**
  * 测试 IK 分词器

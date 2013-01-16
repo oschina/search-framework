@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import net.oschina.search.Searchable;
+import net.oschina.common.search.Searchable;
 
 /**
  * 测试索引的对象

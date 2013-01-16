@@ -1,4 +1,4 @@
-package net.oschina.search;
+package net.oschina.common.search;
 
 /**
  * 索引更新操作

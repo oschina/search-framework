@@ -1,4 +1,4 @@
-package net.oschina.search;
+package net.oschina.common.search;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -148,7 +148,7 @@ public class IndexHolder {
 		IndexWriter writer = getWriter(objs.get(0).getClass());
 		try{
 			for (Searchable obj : objs) {
-				System.out.println("============> " + obj.getClass().getName());
+				System.out.println("============> " + obj.getClass().getName() + " : " + obj.getClass().getProtectionDomain().getCodeSource().getLocation());
 				Document doc = SearchHelper.obj2doc(obj);
 				writer.addDocument(doc);
 				doc_count++;

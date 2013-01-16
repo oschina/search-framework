@@ -1,4 +1,4 @@
-package net.oschina.search;
+package net.oschina.common.search;
 
 import java.util.List;
 import java.util.Map;

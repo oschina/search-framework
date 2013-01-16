@@ -6,7 +6,7 @@ package net.oschina.demo;
 import java.io.IOException;
 import java.util.Arrays;
 
-import net.oschina.search.IndexHolder;
+import net.oschina.common.search.IndexHolder;
 
 /**
  * 测试索引过程
