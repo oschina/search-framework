@@ -200,7 +200,7 @@ public class SearchHelper {
             return null;
 
         Document doc = new Document();
-        doc.add(new StoredField(FN_ID, obj.id()));
+        doc.add(new LongField(FN_ID, obj.id(), Field.Store.YES));
         doc.add(new StoredField(FN_CLASSNAME, obj.getClass().getName()));
 
         //存储字段
