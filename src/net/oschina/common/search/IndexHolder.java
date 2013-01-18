@@ -15,9 +15,11 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -32,6 +34,7 @@ public class IndexHolder {
 
     private final static Log log = LogFactory.getLog(IndexHolder.class);
     private final static IKAnalyzer analyzer = new IKAnalyzer();
+    private final static int MAX_COUNT = 1000;
 	private String indexPath;
 
 	/**
@@ -101,43 +104,90 @@ public class IndexHolder {
 	 * 多库搜索
 	 * @param objClasses
 	 * @param query
-	 * @param max_count
+	 * @param filter
+	 * @param sort
+	 * @param page
+	 * @param count
 	 * @return
 	 * @throws IOException
 	 */
-	public List<Long> find(List<Class<? extends Searchable>> objClasses, Query query, int max_count) throws IOException {
+	public List<Searchable> find(List<Class<? extends Searchable>> objClasses, Query query, Filter filter, Sort sort, int page, int count) throws IOException {
 		IndexSearcher searcher = getSearchers(objClasses);
-		return find(searcher, query, max_count);
+		return find(searcher, query, filter, sort, page, count);
+	}
+	
+	/**
+	 * 单库搜索
+	 * @param objClass
+	 * @param query
+	 * @param filter
+	 * @param sort
+	 * @param page
+	 * @param count
+	 * @return
+	 * @throws IOException
+	 */
+	public List<Long> find(Class<? extends Searchable> objClass, Query query, Filter filter, Sort sort, int page, int count) throws IOException {
+		IndexSearcher searcher = getSearcher(objClass);
+		List<Searchable> results = find(searcher, query, filter, sort, page, count);
+		List<Long> ids = new ArrayList<Long>(results.size());
+		for(Searchable obj : results)
+			ids.add(obj.id());		
+		return ids;
+	}
+
+	/**
+	 * 多库搜索
+	 * @param objClasses
+	 * @param query
+	 * @param filter
+	 * @return
+	 * @throws IOException
+	 */
+	public int count(List<Class<? extends Searchable>> objClasses, Query query, Filter filter) throws IOException {
+		IndexSearcher searcher = getSearchers(objClasses);
+		return count(searcher, query, filter);
 	}
 	
 	/**
 	 * 搜索
 	 * @param beanClass
 	 * @param query
-	 * @param max_count
+	 * @param filter
 	 * @return
 	 * @throws IOException
 	 */
-	public List<Long> find(Class<? extends Searchable> objClass, Query query, int max_count) throws IOException {
+	public int count(Class<? extends Searchable> objClass, Query query, Filter filter) throws IOException {
 		IndexSearcher searcher = getSearcher(objClass);
-		return find(searcher, query, max_count);
+		return count(searcher, query, filter);
 	}
 
 	/**
 	 * 搜索
-	 * @param beanClass
+	 * @param searcher
 	 * @param query
-	 * @param max_count
+	 * @param filter
+	 * @param sort
+	 * @param page
+	 * @param count
 	 * @return
 	 * @throws IOException
 	 */
-	private List<Long> find(IndexSearcher searcher, Query query, int max_count) throws IOException {
+	private List<Searchable> find(IndexSearcher searcher, Query query, Filter filter, Sort sort, int page, int count) throws IOException {
 		try{
-			TopDocs hits = searcher.search(query, null, max_count);
+			TopDocs hits = null;
+			if(filter != null && sort != null)
+				hits = searcher.search(query, filter, MAX_COUNT, sort);
+			else if(sort == null)
+				hits = searcher.search(query, filter, MAX_COUNT);
+			else
+				hits = searcher.search(query, MAX_COUNT);
 			if(hits==null) return null;
 			List<Searchable> results = new ArrayList<Searchable>();
-			int numResults = Math.min(hits.totalHits, max_count);
-			for (int i = 0; i < numResults; i++){
+			int numResults = hits.totalHits;
+			int nBegin = (page - 1) * count;
+			int nEnd = Math.min(nBegin + count, numResults);
+			for (int i = nBegin; i < nEnd; i++){
 				ScoreDoc s_doc = (ScoreDoc)hits.scoreDocs[i];
 				Document doc = searcher.doc(s_doc.doc);
 				Searchable obj = SearchHelper.doc2obj(doc);
@@ -145,14 +195,31 @@ public class IndexHolder {
 					results.add(obj);	
 				}
 			}
-			List<Long> ids = new ArrayList<Long>(results.size());
-			for(Searchable obj : results)
-				ids.add(obj.id());
-			return ids;
+			return results;
+			
 		}catch(IOException e){
 			log.error("Unabled to find via query: " + query, e);
 		}
 		return null;
+	}
+
+	/**
+	 * 根据查询条件统计搜索结果数
+	 * @param searcher
+	 * @param query
+	 * @param filter
+	 * @return
+	 * @throws IOException
+	 */
+	private int count(IndexSearcher searcher, Query query, Filter filter) throws IOException {
+		try{
+			TopDocs hits = (filter!=null)?searcher.search(query,filter,MAX_COUNT):searcher.search(query,MAX_COUNT);
+			if(hits==null) return 0;
+			return hits.totalHits;
+		}catch(IOException e){
+			log.error("Unabled to find via query: " + query, e);
+			return -1;
+		}
 	}
 	
 	/**

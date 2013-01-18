@@ -11,6 +11,9 @@ import java.util.Map;
  */
 public interface Searchable extends Comparable<Searchable> {
 
+	public String FN_TITLE 	= "title";
+	public String FN_DETAIL	= "detail";
+	
     /**
      * 文档的唯一编号
      * @return 文档id

@@ -123,8 +123,8 @@ public class SearchHelper {
                     if(me == null)
                         break;
                     String term = me.getLexemeText();
-                    if(term.length() == 1)
-                        continue;
+                    //if(term.length() == 1)
+                    //    continue;
                     if(StringUtils.isNumeric(StringUtils.remove(term,'.')))
                         continue;
                     if(nowords.contains(term.toLowerCase()))
@@ -212,6 +212,17 @@ public class SearchHelper {
                 	doc.add(obj2field(fn, fv, true));
             }
 
+        //扩展存储字段
+        Map<String, String> eDatas = obj.extendStoreDatas();
+        if(eDatas != null)
+            for(String fn : eDatas.keySet()){
+            	if(fields != null && fields.contains(fn))
+            		continue;
+                String fv = eDatas.get(fn);
+                if(fv != null)
+                	doc.add(obj2field(fn, fv, true));
+            }
+
         //索引字段
         fields = obj.indexFields();
         if(fields != null)
@@ -221,19 +232,12 @@ public class SearchHelper {
                 	doc.add(new TextField(fn, fv, Field.Store.NO));
             }
 
-        //扩展存储字段
-        Map<String, String> eDatas = obj.extendStoreDatas();
-        if(eDatas != null)
-            for(String fn : eDatas.keySet()){
-                String fv = eDatas.get(fn);
-                if(fv != null)
-                	doc.add(obj2field(fn, fv, true));
-            }
-
         //扩展索引字段
         eDatas = obj.extendIndexDatas();
         if(eDatas != null)
             for(String fn : eDatas.keySet()){
+            	if(fields != null && fields.contains(fn))
+            		continue;
                 String fv = eDatas.get(fn);
                 if(fv != null)
                 	doc.add(new TextField(fn, fv, Field.Store.NO));
@@ -265,12 +269,8 @@ public class SearchHelper {
     	
         if (fieldValue instanceof Date) //日期
             return new LongField(field, ((Date)fieldValue).getTime(), store?Field.Store.YES:Field.Store.NO);
-        if (fieldValue instanceof Long) //长整数
-            return new LongField(field, ((Number)fieldValue).longValue(), store?Field.Store.YES:Field.Store.NO);
-        if (fieldValue instanceof Float) //浮点数
-            return new FloatField(field, ((Number)fieldValue).floatValue(), store?Field.Store.YES:Field.Store.NO);
         if (fieldValue instanceof Number) //其他数值
-            return new IntField(field, ((Number)fieldValue).intValue(), store?Field.Store.YES:Field.Store.NO);
+            return new StringField(field, String.valueOf(((Number)fieldValue).longValue()), store?Field.Store.YES:Field.Store.NO);
         //其他默认当字符串处理
         return new StringField(field, (String)fieldValue, store?Field.Store.YES:Field.Store.NO);
     }

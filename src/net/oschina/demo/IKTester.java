@@ -20,7 +20,7 @@ public class IKTester {
     }
 
     protected static void test_split(){
-        String text = "开源中国 www.oschina.net 成立于2008年8月，是目前中国最大的开源技术社区。我们传播开源的理念，推广开源项目，为 IT 开发者提供了一个发现、使用、并交流开源技术的平台。";
+        String text = "android 刷机";
         long ct = System.currentTimeMillis();
         for(String word : SearchHelper.splitKeywords(text)){
             System.out.println(word);
