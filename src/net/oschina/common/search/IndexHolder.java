@@ -178,8 +178,10 @@ public class IndexHolder {
 			TopDocs hits = null;
 			if(filter != null && sort != null)
 				hits = searcher.search(query, filter, MAX_COUNT, sort);
-			else if(sort == null)
+			else if(filter != null)
 				hits = searcher.search(query, filter, MAX_COUNT);
+			else if(sort != null)
+				hits = searcher.search(query, MAX_COUNT, sort);
 			else
 				hits = searcher.search(query, MAX_COUNT);
 			if(hits==null) return null;
