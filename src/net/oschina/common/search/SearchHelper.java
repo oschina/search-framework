@@ -39,8 +39,8 @@ public class SearchHelper {
 	private final static BooleanQuery nullQuery = new BooleanQuery();
     private final static Formatter highlighter_formatter = new SimpleHTMLFormatter("<span class=\"highlight\">","</span>");
 
-    private final static String FN_ID = "___id";
-    private final static String FN_CLASSNAME = "___class";
+    public final static String FN_ID = "___id";
+    public final static String FN_CLASSNAME = "___class";
 
     private final static List<String> nowords = new ArrayList<String>(){{
         try{
