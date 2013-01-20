@@ -82,4 +82,8 @@ public class Post implements Searchable {
 	public List<? extends Searchable> ListAfter(long id, int count) {
 		return null;
 	}
+	@Override
+	public float boost() {
+		return 1.0f;
+	}
 }

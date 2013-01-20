@@ -34,6 +34,12 @@ public interface Searchable extends Comparable<Searchable> {
     public List<String> indexFields();
 
     /**
+     * 文档的优先级
+     * @return
+     */
+    public float boost();
+    
+    /**
      * 扩展的存储数据
      * @return 扩展数据K/V
      */
