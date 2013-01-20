@@ -11,6 +11,7 @@ import org.apache.lucene.document.*;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.highlight.*;
@@ -150,8 +151,11 @@ public class SearchHelper {
             return text;
         String result = null;
         try {
-            key = QueryParser.escape(key.trim().toLowerCase());
-            QueryScorer scorer = new QueryScorer(new TermQuery(new Term(null,QueryParser.escape(key))));
+        	PhraseQuery pquery = new PhraseQuery();
+        	for(String sk : splitKeywords(key)){
+        		pquery.add(new Term("",QueryParser.escape(sk)));
+        	}         
+            QueryScorer scorer = new QueryScorer(pquery);
             Highlighter hig = new Highlighter(highlighter_formatter, scorer);
             TokenStream tokens = analyzer.tokenStream(null, new StringReader(text));
             result = hig.getBestFragment(tokens, text);
@@ -228,8 +232,13 @@ public class SearchHelper {
         if(fields != null)
             for(String fn : fields) {
                 String fv = (String)readField(obj, fn);
-                if(fv != null)
-                	doc.add(new TextField(fn, fv, Field.Store.NO));
+                if(fv != null){
+                	TextField tf = new TextField(fn, fv, Field.Store.NO);
+                	tf.setBoost(obj.boost());
+                	if(obj.boost() > 2.0f)
+                		System.out.println("Boost =============> " + obj.boost());
+                	doc.add(tf);
+                }
             }
 
         //扩展索引字段
@@ -239,8 +248,11 @@ public class SearchHelper {
             	if(fields != null && fields.contains(fn))
             		continue;
                 String fv = eDatas.get(fn);
-                if(fv != null)
-                	doc.add(new TextField(fn, fv, Field.Store.NO));
+                if(fv != null){
+                	TextField tf = new TextField(fn, fv, Field.Store.NO);
+                	tf.setBoost(obj.boost());
+                	doc.add(tf);
+                }
             }
 
         return doc;

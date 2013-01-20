@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="lib/lucene-queryparser-4.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/lucene-suggest-4.0.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/lucene-memory-4.0.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

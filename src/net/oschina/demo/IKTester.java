@@ -11,12 +11,12 @@ import net.oschina.common.search.SearchHelper;
 public class IKTester {
 
     public static void main(String[] args) {
-        test_split();
+    	test_highlight();
     }
 
     protected static void test_highlight() {
-        String text = "Tomcat 是最好的 Java 应用服务器";
-        System.out.println("RESULT:" + SearchHelper.highlight(text, "Tomcat"));
+        String text = "SQL server 是最好的 数据库 应用服务器";
+        System.out.println("RESULT:" + SearchHelper.highlight(text, "sql server"));
     }
 
     protected static void test_split(){
