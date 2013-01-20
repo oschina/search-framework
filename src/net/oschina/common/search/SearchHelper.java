@@ -235,8 +235,6 @@ public class SearchHelper {
                 if(fv != null){
                 	TextField tf = new TextField(fn, fv, Field.Store.NO);
                 	tf.setBoost(obj.boost());
-                	if(obj.boost() > 2.0f)
-                		System.out.println("Boost =============> " + obj.boost());
                 	doc.add(tf);
                 }
             }
