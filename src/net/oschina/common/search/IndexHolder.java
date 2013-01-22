@@ -130,7 +130,7 @@ public class IndexHolder {
 	public List<Long> find(Class<? extends Searchable> objClass, Query query, Filter filter, Sort sort, int page, int count) throws IOException {
 		IndexSearcher searcher = getSearcher(objClass);
 		List<Searchable> results = find(searcher, query, filter, sort, page, count);
-		List<Long> ids = new ArrayList<Long>(results.size());
+		List<Long> ids = new ArrayList<Long>();
 		for(Searchable obj : results){
 			if(obj != null)
 				ids.add(obj.id());		
