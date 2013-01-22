@@ -131,8 +131,10 @@ public class IndexHolder {
 		IndexSearcher searcher = getSearcher(objClass);
 		List<Searchable> results = find(searcher, query, filter, sort, page, count);
 		List<Long> ids = new ArrayList<Long>(results.size());
-		for(Searchable obj : results)
-			ids.add(obj.id());		
+		for(Searchable obj : results){
+			if(obj != null)
+				ids.add(obj.id());		
+		}
 		return ids;
 	}
 
