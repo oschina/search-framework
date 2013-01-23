@@ -21,6 +21,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.TotalHitCountCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
@@ -216,9 +217,12 @@ public class IndexHolder {
 	 */
 	private int count(IndexSearcher searcher, Query query, Filter filter) throws IOException {
 		try{
-			TopDocs hits = (filter!=null)?searcher.search(query,filter,MAX_COUNT):searcher.search(query,MAX_COUNT);
-			if(hits==null) return 0;
-			return hits.totalHits;
+			TotalHitCountCollector thcc = new TotalHitCountCollector();
+			if(filter != null)
+				searcher.search(query,filter,thcc);
+			else
+				searcher.search(query,thcc);
+			return Math.min(MAX_COUNT, thcc.getTotalHits());
 		}catch(IOException e){
 			log.error("Unabled to find via query: " + query, e);
 			return -1;
