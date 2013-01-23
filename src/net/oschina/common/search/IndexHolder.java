@@ -188,9 +188,8 @@ public class IndexHolder {
 				hits = searcher.search(query, MAX_COUNT);
 			if(hits==null) return null;
 			List<Searchable> results = new ArrayList<Searchable>();
-			int numResults = hits.totalHits;
 			int nBegin = (page - 1) * count;
-			int nEnd = Math.min(nBegin + count, numResults);
+			int nEnd = Math.min(nBegin + count, hits.scoreDocs.length);
 			for (int i = nBegin; i < nEnd; i++){
 				ScoreDoc s_doc = (ScoreDoc)hits.scoreDocs[i];
 				Document doc = searcher.doc(s_doc.doc);
