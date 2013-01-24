@@ -126,8 +126,8 @@ public class SearchHelper {
                     String term = me.getLexemeText();
                     //if(term.length() == 1)
                     //    continue;
-                    if(StringUtils.isNumeric(StringUtils.remove(term,'.')))
-                        continue;
+                    //if(StringUtils.isNumeric(StringUtils.remove(term,'.')))
+                    //    continue;
                     if(nowords.contains(term.toLowerCase()))
                         continue;
                     keys.add(term);
